@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
@@ -8,7 +8,8 @@ import { Plus, Check, Star, MessageSquare, ArrowLeft } from 'lucide-react';
 const CoffeeDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [coffee, setCoffee] = useState(null);
+    const location = useLocation();
+    const [coffee, setCoffee] = useState(location.state?.coffee || null);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -32,6 +33,7 @@ const CoffeeDetails = () => {
                 setReviews(reviewRes.data);
             } catch (err) {
                 console.error("Failed to load coffee details", err);
+                // If fetch fails and no coffee from state, keep as null
             } finally {
                 setLoading(false);
             }

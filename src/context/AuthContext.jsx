@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -15,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/login", {
+            const res = await axios.post(`${API_URL}/api/auth/login`, {
                 email,
                 password,
             });
@@ -23,20 +25,27 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("user", JSON.stringify(res.data));
             return { success: true };
         } catch (err) {
-            return { success: false, message: err.response?.data || "Login failed" };
+            console.error("Login request failed:", err.response || err.message || err);
+            const message = err.response?.data?.message || err.response?.data || err.message || "Login failed";
+            return { success: false, message };
         }
     };
 
     const register = async (name, email, password) => {
         try {
-            await axios.post("http://localhost:5000/api/auth/register", {
+            const res = await axios.post(`${API_URL}/api/auth/register`, {
                 name,
                 email,
                 password,
             });
+            // Auto-login: set user with returned data
+            setUser(res.data.user);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
             return { success: true };
         } catch (err) {
-            return { success: false, message: err.response?.data || "Registration failed" };
+            console.error("Registration request failed:", err.response || err.message || err);
+            const message = err.response?.data?.message || err.response?.data || err.message || "Registration failed";
+            return { success: false, message };
         }
     };
 

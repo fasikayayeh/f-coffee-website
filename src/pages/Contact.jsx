@@ -1,16 +1,29 @@
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useState } from 'react';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Contact = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setTimeout(() => {
+        setLoading(true);
+        setError('');
+
+        try {
+            await axios.post(`${API_URL}/api/contact`, formData);
             setSubmitted(true);
             setFormData({ name: '', email: '', message: '' });
-        }, 1000);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -78,6 +91,7 @@ const Contact = () => {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {error && <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg text-sm">{error}</div>}
                                 <div>
                                     <label className="block text-sm font-semibold text-coffee-dark mb-2">Your Name</label>
                                     <input
@@ -109,9 +123,14 @@ const Contact = () => {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="w-full bg-accent text-coffee-dark py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-md transform hover:-translate-y-1"
+                                    className="w-full bg-accent text-coffee-dark py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-md transform hover:-translate-y-1 flex justify-center items-center"
+                                    disabled={loading}
                                 >
-                                    Send Message
+                                    {loading ? (
+                                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-coffee-dark"></div>
+                                    ) : (
+                                        'Send Message'
+                                    )}
                                 </button>
                             </form>
                         )}

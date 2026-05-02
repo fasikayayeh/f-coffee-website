@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { Plus, Check, Coffee } from 'lucide-react';
@@ -18,6 +19,7 @@ const Menu = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useContext(CartContext);
     const [addedItems, setAddedItems] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCoffees = async () => {
@@ -87,7 +89,7 @@ const Menu = () => {
                     <div className="grid grid-cols-1 md://grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredCoffees.map(coffee => (
                             <div key={coffee._id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
-                                <div className="h-64 overflow-hidden relative group cursor-pointer" onClick={() => window.location.href = `/product/${coffee._id}`}>
+                                <div className="h-64 overflow-hidden relative group cursor-pointer" onClick={() => navigate(`/product/${coffee._id}`, { state: { coffee } })}>
                                     <img
                                         src={coffee.image}
                                         alt={coffee.name}

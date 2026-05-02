@@ -21,7 +21,7 @@ const Signup = () => {
         const result = await register(name, email, password);
 
         if (result.success) {
-            navigate('/login');
+            navigate('/profile');
         } else {
             setError(result.message);
         }
